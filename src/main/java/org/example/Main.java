@@ -1,17 +1,90 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import static spark.Spark.*;
+import com.google.gson.Gson;
+
+import java.util.*;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        port(4567);
+        CatalogService catalog = new CatalogService();
+        Gson gson = new Gson();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        get("/info/:id", (req, res) -> {
+            int id = Integer.parseInt(req.params("id"));
+            Book book = catalog.getBookById(id);
+
+            res.type("application/json");
+
+            if (book != null) {
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                response.put("title", book.getTitle());
+                response.put("quantity", book.getQuantity());
+                response.put("price", book.getPrice());
+
+                return gson.toJson(response);
+            } else {
+                return gson.toJson(Collections.singletonMap("error", "Book not found"));
+            }
+        });
+
+
+        get("/search/:topic", (req, res) -> {
+            String topic = req.params("topic");
+            List<Book> result = catalog.getBooksByTopic(topic);
+
+            res.type("application/json");
+
+            List<Map<String, Object>> response = new ArrayList<>();
+
+            for (Book b : result) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("id", b.getId());
+                item.put("title", b.getTitle());
+                response.add(item);
+            }
+
+            return gson.toJson(response);
+        });
+
+
+
+
+        post("/update", (req, res) -> {
+
+            UpdateRequest request = gson.fromJson(req.body(), UpdateRequest.class);
+
+            System.out.println("UPDATE request for book id: " + request.id);
+
+            Book book = catalog.getBookById(request.id);
+
+            res.type("application/json");
+
+            if (book != null) {
+
+                if (request.type.equalsIgnoreCase("quantity")) {
+                    book.setQuantity(book.getQuantity() + request.value);
+                } else if (request.type.equalsIgnoreCase("price")) {
+                    book.setPrice(request.value);
+                } else {
+                    return gson.toJson(Collections.singletonMap("error", "invalid type"));
+                }
+
+                catalog.saveToCSV();
+
+                return gson.toJson(Collections.singletonMap("status", "updated"));
+            }
+
+            return gson.toJson(Collections.singletonMap("error", "book not found"));
+        });
+
+
     }
+}
+class UpdateRequest {
+    int id;
+    String type;
+    int value;
 }
