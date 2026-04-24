@@ -1,5 +1,4 @@
-package org.example;
-
+package bazar.catalog;
 import java.io.*;
 import java.util.*;
 
