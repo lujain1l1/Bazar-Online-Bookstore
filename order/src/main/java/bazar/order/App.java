@@ -48,6 +48,7 @@ public class App {
                     saveOrderToCSV(itemId, title);
 
                     responseMap.put("status", "success");
+                    responseMap.put("message", "bought book " + title);
                     return gson.toJson(responseMap);
                 }
             }

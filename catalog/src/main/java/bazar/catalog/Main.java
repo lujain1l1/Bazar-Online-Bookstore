@@ -1,4 +1,4 @@
-package org.example;
+package bazar.catalog;
 
 import static spark.Spark.*;
 import com.google.gson.Gson;
@@ -10,6 +10,9 @@ public class Main {
         port(4567);
         CatalogService catalog = new CatalogService();
         Gson gson = new Gson();
+
+        System.out.println("Catalg Server started on port 4567...");
+
 
         get("/info/:id", (req, res) -> {
             int id = Integer.parseInt(req.params("id"));
