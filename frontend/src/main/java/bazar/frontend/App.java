@@ -9,8 +9,8 @@ import java.net.http.HttpResponse;
 import java.net.URI;
 
 public class App {
-    private static final String CATALOG_URL = "http://localhost:4567";
-    private static final String ORDER_URL = "http://localhost:8081";
+    private static final String CATALOG_URL = "http://catalog-service:4567";
+    private static final String ORDER_URL = "http://order-service:8081";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 

@@ -16,7 +16,7 @@ public class App {
 
     private static final Gson gson = new Gson();
     private static final HttpClient httpClient = HttpClient.newHttpClient();
-    private static final String CATALOG_URL = "http://localhost:4567";
+    private static final String CATALOG_URL = "http://catalog-service:4567";
 
     public static void main(String[] args) {
         port(8081);
