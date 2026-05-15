@@ -9,11 +9,11 @@ import java.net.http.HttpResponse;
 import java.net.URI;
 
 public class App {
-    private static final String CATALOG_URL = "http://catalog-service:4567";
+    //private static final String CATALOG_URL = "http://catalog-service:4567";
     private static final String ORDER_URL = "http://order-service:8081";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
-
+    private static int catalogCounter = 0;
     public static void main(String[] args) {
         port(8080);
         System.out.println("FrontEnd Server started on port 8080...");
@@ -22,8 +22,7 @@ public class App {
         get("/search/:topic", (req, res) -> {
             String topic = req.params(":topic");
             try {
-                String response = sendGetRequest(CATALOG_URL + "/search/" + topic);
-                res.type("application/json");
+                String response = sendGetRequest(getCatalogServiceUrl() + "/search/" + topic);                res.type("application/json");
                 return response;
             } catch (Exception e) {
                 res.status(500);
@@ -34,8 +33,7 @@ public class App {
         get("/info/:id", (req, res) -> {
             String id = req.params(":id");
             try {
-                String response = sendGetRequest(CATALOG_URL + "/info/" + id);
-                res.type("application/json");
+                String response = sendGetRequest(getCatalogServiceUrl() + "/info/" + id);                res.type("application/json");
                 return response;
             } catch (Exception e) {
                 res.status(500);
@@ -74,5 +72,14 @@ public class App {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
+    }
+    private static String getCatalogServiceUrl() {
+        if (catalogCounter % 2 == 0) {
+            catalogCounter++;
+            return "http://catalog-app:4567";
+        } else {
+            catalogCounter++;
+            return "http://catalog-app-2:4567";
+        }
     }
 }

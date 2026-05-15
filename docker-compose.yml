@@ -7,7 +7,11 @@ services:
     container_name: catalog-app
     ports:
       - "4567:4567"
-
+  catalog-service-2:
+    build: ./catalog
+    container_name: catalog-app-2
+    ports:
+      - "4568:4567"
   order-service:
     build: ./order
     volumes:
@@ -17,7 +21,11 @@ services:
       - "8081:8081"
     depends_on:
       - catalog-service
-
+  order-service-2:
+    build: ./order
+    container_name: order-app-2
+    ports:
+      - "8082:8081"
   frontend-service:
     build: ./frontend
     container_name: frontend-app
