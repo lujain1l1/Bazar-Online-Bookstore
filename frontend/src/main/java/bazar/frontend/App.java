@@ -25,16 +25,33 @@ public class App {
         System.out.flush();
 
         get("/search/:topic", (req, res) -> {
-            String topic = req.params(":topic");
 
+            String topic = req.params(":topic");
+            long start = System.currentTimeMillis();
+
+            System.out.println("REQUEST arriveddddddd - SEARCH");
+
+            // CACHE HIT
             if (cache.containsKey(topic)) {
+                long end = System.currentTimeMillis();
+
+                System.out.println("CACHE HIT - SEARCH - Response time: " + (end - start) + " ms");
+
+                res.type("application/json");
                 return cache.get(topic);
             }
 
             try {
-                String response = sendGetRequest(getCatalogServiceUrl() + "/search/" + topic);
+                // CACHE MISS → call catalog service
+                String response = sendGetRequest(
+                        getCatalogServiceUrl() + "/search/" + topic
+                );
 
                 cache.put(topic, response);
+
+                long end = System.currentTimeMillis();
+
+                System.out.println("CACHE MISS - SEARCH - Response time: " + (end - start) + " ms");
 
                 res.type("application/json");
                 return response;
@@ -76,9 +93,16 @@ public class App {
 
         post("/purchase/:id", (req, res) -> {
             String id = req.params(":id");
+            System.out.println("REQUEST arrived - PURCHASE");
+            long start = System.currentTimeMillis();
             try {
                 String response = sendPostRequest(getOrderServiceUrl() + "/purchase/" + id);
                 cache.remove(id);
+
+                long end = System.currentTimeMillis();
+
+                System.out.println("CACHE INVALIDATION - ITEM " + id);
+                System.out.println("PURCHASE RESPONSE TIME: " + (end - start) + " ms");
                 res.type("application/json");
                 return response;
             } catch (Exception e) {
