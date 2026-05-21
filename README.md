@@ -1,6 +1,6 @@
 # 📚 Bazar.com — Distributed Online Book Store
 
-Bazar.com is a **multi-tier, microservices-based online bookstore** developed for the **Distributed Operating Systems** course.
+Bazar.com is a **distributed online bookstore built using a multi-tier microservices architecturee** developed for the **Distributed Operating Systems** course.
 The system evolved from a simple client-server architecture into a highly available, replicated, and cached distributed system.
 
 ---
@@ -70,6 +70,10 @@ requests.
 
 Each service runs independently and communicates through HTTP REST APIs.
 
+## ✅ REST-Based Communication
+
+All services communicate using HTTP REST APIs and exchange data in JSON format.
+
 ## ✅ Replication
 
 The system includes:
@@ -110,7 +114,7 @@ The entire project is containerized using:
 | Technology     | Usage                     |
 | -------------- | ------------------------- |
 | Java           | Main programming language |
-| Spark Java     | Lightweight web framework |
+| Spark Java     | Lightweight micro web framework |
 | REST APIs      | Communication between services |
 | JSON           | REST API responses        |
 | CSV Files      | Persistent storage        |
@@ -188,6 +192,7 @@ Caching significantly improves read latency, reducing response time to nearly ze
 /frontend   → Front-end source code and Dockerfile
 /catalog    → Catalog service source code, Dockerfile, and catalog.csv
 /order      → Order service source code, Dockerfile, and orders.csv
+/docs       → Design documents, outputs, and performance evaluation
 ```
 
 ---
