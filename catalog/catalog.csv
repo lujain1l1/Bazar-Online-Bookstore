@@ -1,5 +1,8 @@
 id,title,quantity,price,topic
-1,How to get a good grade in DOS in 40 minutes a day,4,60,distributed
-2,RPCs for Noobs,3,50,distributed
+1,How to get a good grade in DOS in 40 minutes a day,2,60,distributed
+2,RPCs for Noobs,2,50,distributed
 3,Xen and the Art of Surviving Undergraduate School,5,70,undergraduate
-4,Cooking for the Impatient Undergrad,9,40,undergraduate
+4,Cooking for the Impatient Undergrad,8,40,undergraduate
+5,How to finish Project 3 on time,9,55,undergraduate School
+6,Why theory classes are so hard,10,60,undergraduate School
+7,Spring in the Pioneer Valley,0,35,undergraduate School

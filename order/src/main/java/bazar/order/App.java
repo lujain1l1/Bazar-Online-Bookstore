@@ -18,6 +18,10 @@ public class App {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final String CATALOG_URL = "http://catalog-service:4567";
 
+    private static final String[] CATALOG_URLS = {
+            "http://catalog-service:4567",
+            "http://catalog-service-2:4567"
+    };
     public static void main(String[] args) {
         port(8081);
 
@@ -97,28 +101,63 @@ public class App {
         return null;
     }
 
+//    private static boolean updateCatalogStock(int id, int value) {
+//
+//        try {
+//            Map<String, Object> updateData = new HashMap<>();
+//            updateData.put("id", id);
+//            updateData.put("type", "quantity");
+//            updateData.put("value", value);
+//
+//            String jsonBody = gson.toJson(updateData);
+//
+//            HttpRequest request = HttpRequest.newBuilder()
+//                    .uri(URI.create(CATALOG_URL + "/update"))
+//                    .header("Content-Type", "application/json")
+//                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+//                    .build();
+//
+//
+//
+//            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+//            return response.statusCode() == 200;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
+
     private static boolean updateCatalogStock(int id, int value) {
-        try {
-            Map<String, Object> updateData = new HashMap<>();
-            updateData.put("id", id);
-            updateData.put("type", "quantity");
-            updateData.put("value", value);
+        boolean allUpdated = true;
 
-            String jsonBody = gson.toJson(updateData);
+        for (String url : CATALOG_URLS) {
+            try {
+                Map<String, Object> updateData = new HashMap<>();
+                updateData.put("id", id);
+                updateData.put("type", "quantity");
+                updateData.put("value", value);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(CATALOG_URL + "/update"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+                String jsonBody = gson.toJson(updateData);
 
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url + "/update")) // يرسل لكل نسخة على حدة
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                        .build();
 
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 200;
-        } catch (Exception e) {
-            return false;
+                if (response.statusCode() != 200) {
+                    allUpdated = false;
+                    System.err.println("Failed to update catalog at: " + url);
+                } else {
+                    System.out.println("Successfully synced with: " + url);
+                }
+            } catch (Exception e) {
+                allUpdated = false;
+                System.err.println("Error syncing with " + url + ": " + e.getMessage());
+            }
         }
+        return allUpdated;
     }
 
     private static void saveOrderToCSV(String id, String title) {
