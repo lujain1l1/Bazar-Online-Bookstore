@@ -29,6 +29,7 @@ public class App {
         });
 
         post("/purchase/:item_id", (req, res) -> {
+            System.out.println("ORDER NODE = " + System.getenv("NODE"));
             String itemId = req.params(":item_id");
             res.type("application/json");
 

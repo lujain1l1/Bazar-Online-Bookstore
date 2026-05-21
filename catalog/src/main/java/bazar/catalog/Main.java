@@ -15,6 +15,7 @@ public class Main {
 
 
         get("/info/:id", (req, res) -> {
+            System.out.println("CATALOG NODE = " + System.getenv("NODE"));
             int id = Integer.parseInt(req.params("id"));
             Book book = catalog.getBookById(id);
 
@@ -35,6 +36,7 @@ public class Main {
 
 
         get("/search/:topic", (req, res) -> {
+            System.out.println("CATALOG NODE = " + System.getenv("NODE"));
             String topic = req.params("topic");
             List<Book> result = catalog.getBooksByTopic(topic);
 

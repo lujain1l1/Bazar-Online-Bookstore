@@ -7,23 +7,38 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class App {
     //private static final String CATALOG_URL = "http://catalog-service:4567";
-    private static final String ORDER_URL = "http://order-service:8081";
+    //private static final String ORDER_URL = "http://order-service:8081";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
+    private static final Map<String, String> cache = new HashMap<>();
     private static int catalogCounter = 0;
+    private static int orderCounter = 0;
     public static void main(String[] args) {
         port(8080);
         System.out.println("FrontEnd Server started on port 8080...");
-
+        System.out.println("FrontEnd START WORKS");
+        System.out.flush();
 
         get("/search/:topic", (req, res) -> {
             String topic = req.params(":topic");
+
+            if (cache.containsKey(topic)) {
+                return cache.get(topic);
+            }
+
             try {
-                String response = sendGetRequest(getCatalogServiceUrl() + "/search/" + topic);                res.type("application/json");
+                String response = sendGetRequest(getCatalogServiceUrl() + "/search/" + topic);
+
+                cache.put(topic, response);
+
+                res.type("application/json");
                 return response;
+
             } catch (Exception e) {
                 res.status(500);
                 return "{\"error\": \"Catalog server connection failed\"}";
@@ -31,10 +46,28 @@ public class App {
         });
 
         get("/info/:id", (req, res) -> {
+            System.out.println("REQUEST arriveddddddd");
             String id = req.params(":id");
+            long start = System.currentTimeMillis();
+
+            if (cache.containsKey(id)) {
+                long end = System.currentTimeMillis();
+                System.out.println("CACHE HIT - Response time: " + (end - start) + " ms");
+                res.type("application/json");
+                return cache.get(id);
+            }
+
             try {
-                String response = sendGetRequest(getCatalogServiceUrl() + "/info/" + id);                res.type("application/json");
+                String response = sendGetRequest(getCatalogServiceUrl() + "/info/" + id);
+
+                cache.put(id, response);
+                long end = System.currentTimeMillis();
+                System.out.println("CACHE MISS - Response time: " + (end - start) + " ms");
+
+
+                res.type("application/json");
                 return response;
+
             } catch (Exception e) {
                 res.status(500);
                 return "{\"error\": \"Catalog server connection failed\"}";
@@ -44,7 +77,8 @@ public class App {
         post("/purchase/:id", (req, res) -> {
             String id = req.params(":id");
             try {
-                String response = sendPostRequest(ORDER_URL + "/purchase/" + id);
+                String response = sendPostRequest(getOrderServiceUrl() + "/purchase/" + id);
+                cache.remove(id);
                 res.type("application/json");
                 return response;
             } catch (Exception e) {
@@ -80,6 +114,15 @@ public class App {
         } else {
             catalogCounter++;
             return "http://catalog-app-2:4567";
+        }
+    }
+    private static String getOrderServiceUrl() {
+        if (orderCounter % 2 == 0) {
+            orderCounter++;
+            return "http://order-app:8081";
+        } else {
+            orderCounter++;
+            return "http://order-app-2:8081";
         }
     }
 }
